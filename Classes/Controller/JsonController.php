@@ -25,6 +25,11 @@ class JsonController extends ActionController
      */
     private $carRepository = null;
 
+    /**
+     * @var string
+     */
+    protected $defaultViewObjectName = \TYPO3\CMS\Extbase\Mvc\View\JsonView::class;
+
     public function injectCarRepository(CarRepository $carRepository)
     {
         $this->carRepository = $carRepository;
@@ -33,23 +38,9 @@ class JsonController extends ActionController
     public function listAction()
     {
         $cars = $this->carRepository->findAll();
-        return json_encode($this->getJsonRepresentation($cars));
-    }
-
-    /**
-     * @param \Traversable|Car[] $cars
-     * @return array
-     */
-    private function getJsonRepresentation(\Traversable $cars)
-    {
-        $result = [];
-        foreach ($cars as $car) {
-            $result[] = [
-                'vin' => $car->getVin(),
-                'color' => $car->getColor(),
-                'brand' => $car->getBrand()->getName(),
-            ];
-        }
-        return $result;
+        /** @var \TYPO3\CMS\Extbase\Mvc\View\JsonView $view */
+        $view = $this->view;
+        $view->assign('value', $cars);
+        $view->setConfiguration([]);
     }
 }
